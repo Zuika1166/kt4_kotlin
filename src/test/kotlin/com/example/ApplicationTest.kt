@@ -7,7 +7,6 @@ import com.example.dto.TokenResponse
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.contentType
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
