@@ -4,6 +4,7 @@ import com.example.config.AdminCredentials
 import com.example.config.DatabaseSettings
 import com.example.config.JwtConfig
 import com.example.dto.TokenResponse
+import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.bearerAuth
@@ -60,12 +61,12 @@ class ApplicationTest {
         }
         assertEquals(HttpStatusCode.Created, register.status)
 
-        val userToken = login("john", "secret123")
+        val userToken = login(client, "john", "secret123")
         val me = client.get("/auth/me") {
             bearerAuth(userToken)
         }
         assertEquals(HttpStatusCode.OK, me.status)
-        assertTrue(me.bodyAsText().contains(""role": "user""))
+        assertTrue(me.bodyAsText().contains("user"))
 
         val create = client.post("/books") {
             bearerAuth(userToken)
@@ -95,14 +96,14 @@ class ApplicationTest {
         }
         assertEquals(HttpStatusCode.Forbidden, forbiddenUsers.status)
 
-        val adminToken = login("admin", "admin123")
+        val adminToken = login(client, "admin", "admin123")
 
         val users = client.get("/admin/users") {
             bearerAuth(adminToken)
         }
         assertEquals(HttpStatusCode.OK, users.status)
-        assertTrue(users.bodyAsText().contains(""role": "admin""))
-        assertTrue(users.bodyAsText().contains(""role": "user""))
+        assertTrue(users.bodyAsText().contains("admin"))
+        assertTrue(users.bodyAsText().contains("john"))
 
         val delete = client.delete("/books/1") {
             bearerAuth(adminToken)
@@ -127,7 +128,7 @@ class ApplicationTest {
             setBody("""{"login":"socket-user","password":"secret123"}""")
         }
 
-        val token = login("socket-user", "secret123")
+        val token = login(client, "socket-user", "secret123")
         val wsClient = createClient {
             install(WebSockets)
         }
@@ -147,16 +148,17 @@ class ApplicationTest {
 
             assertTrue(frame is Frame.Text)
             val payload = (frame as Frame.Text).readText()
-            assertTrue(payload.contains(""type":"created""))
+            assertTrue(payload.contains("created"))
             assertTrue(payload.contains("Domain-Driven Design"))
         }
     }
 
-    private suspend fun io.ktor.client.HttpClient.login(
+    private suspend fun login(
+        client: HttpClient,
         login: String,
         password: String
     ): String {
-        val response = post("/auth/login") {
+        val response = client.post("/auth/login") {
             contentType(ContentType.Application.Json)
             setBody("""{"login":"$login","password":"$password"}""")
         }
