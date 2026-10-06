@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kt4
+      POSTGRES_USER: kt4
+      POSTGRES_PASSWORD: kt4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kt4 -d kt4"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/kt4
+      DB_USER: kt4
+      DB_PASSWORD: kt4
+      JWT_SECRET: change-this-secret
+      ADMIN_LOGIN: admin
+      ADMIN_PASSWORD: admin123
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
