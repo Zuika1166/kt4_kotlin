@@ -1,7 +1,5 @@
 # KT4 Kotlin
 
-Итоговый backend-проект на Kotlin и Ktor. В одном приложении объединены REST API, CRUD, JWT-аутентификация, роли пользователей, PostgreSQL, Swagger/OpenAPI, WebSocket-уведомления, централизованная обработка ошибок, логирование и Docker-деплой.
-
 ## Стек
 
 - Kotlin 2.4.20
@@ -81,7 +79,7 @@ src/main/kotlin/com/example
 
 ## Роли
 
-В системе две роли:
+Всего две роли:
 
 - `user`
 - `admin`
@@ -90,30 +88,26 @@ src/main/kotlin/com/example
 
 Администратор создаётся при запуске приложения из переменных окружения `ADMIN_LOGIN` и `ADMIN_PASSWORD`.
 
-По умолчанию для локального запуска:
+По умолчанию:
 
 ```text
 login: admin
 password: admin123
 ```
 
-Для реального развёртывания эти значения необходимо изменить.
-
 ## Разграничение доступа
 
-| Метод | Маршрут | Доступ |
-| --- | --- | --- |
-| GET | /health | публичный |
-| POST | /auth/register | публичный |
-| POST | /auth/login | публичный |
-| GET | /auth/me | user, admin |
-| GET | /books | публичный |
-| GET | /books/{id} | публичный |
-| POST | /books | user, admin |
-| PUT | /books/{id} | user, admin |
-| DELETE | /books/{id} | только admin |
-| GET | /admin/users | только admin |
-| WS | /ws/notifications | авторизованный пользователь |
+GET | /health | публичный 
+POST | /auth/register | публичный 
+POST | /auth/login | публичный 
+GET | /auth/me | user, admin 
+GET | /books | публичный 
+GET | /books/{id} | публичный 
+POST | /books | user, admin 
+PUT | /books/{id} | user, admin 
+DELETE | /books/{id} | только admin 
+GET | /admin/users | только admin 
+WS | /ws/notifications | авторизованный пользователь 
 
 ## База данных
 
@@ -124,26 +118,22 @@ password: admin123
 - `users`
 - `books`
 
-Данные сохраняются между перезапусками контейнера в Docker volume.
 
 ## Переменные окружения
 
-| Переменная | Значение по умолчанию |
-| --- | --- |
-| DB_URL | jdbc:postgresql://localhost:5432/kt4 |
-| DB_USER | kt4 |
-| DB_PASSWORD | kt4 |
-| DB_DRIVER | org.postgresql.Driver |
-| JWT_SECRET | local-development-secret-change-me |
-| JWT_ISSUER | kt4-kotlin |
-| JWT_AUDIENCE | kt4-users |
-| JWT_REALM | KT4 API |
-| ADMIN_LOGIN | admin |
-| ADMIN_PASSWORD | admin123 |
+DB_URL | jdbc:postgresql://localhost:5432/kt4 
+DB_USER | kt4 
+DB_PASSWORD | kt4 |
+DB_DRIVER | org.postgresql.Driver |
+JWT_SECRET | local-development-secret-change-me |
+JWT_ISSUER | kt4-kotlin |
+JWT_AUDIENCE | kt4-users |
+JWT_REALM | KT4 API |
+ADMIN_LOGIN | admin |
+ADMIN_PASSWORD | admin123 |
 
 ## Запуск через Docker Compose
 
-Для полного запуска приложения вместе с PostgreSQL достаточно:
 
 ```bash
 docker compose up --build
@@ -172,7 +162,6 @@ docker compose down -v
 
 ## Локальный запуск без Docker
 
-Нужны JDK 21, Gradle и запущенный PostgreSQL.
 
 Создать БД и пользователя со значениями из переменных окружения, затем:
 
@@ -182,7 +171,7 @@ gradle run
 
 ## Тесты
 
-Для тестов PostgreSQL не требуется. Используется H2 в режиме совместимости с PostgreSQL.
+ Используется H2 в режиме совместимости с PostgreSQL.
 
 Запуск:
 
@@ -190,19 +179,6 @@ gradle run
 gradle test
 ```
 
-Тесты проверяют:
-
-- запуск всех модулей в одном приложении;
-- Swagger и OpenAPI;
-- регистрацию и JWT-вход;
-- `/auth/me`;
-- создание и изменение книги обычным пользователем;
-- запрет удаления книги для роли `user`;
-- доступ роли `admin` к списку пользователей;
-- удаление книги администратором;
-- централизованные ответы 400 и 404;
-- WebSocket-подключение;
-- получение WebSocket-события после создания книги.
 
 ## Swagger и OpenAPI
 
@@ -218,7 +194,6 @@ OpenAPI:
 http://localhost:8080/openapi
 ```
 
-Документация содержит все REST-маршруты, требования к JWT, ограничения по ролям и WebSocket-эндпоинт.
 
 ## Регистрация
 
